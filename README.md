@@ -52,6 +52,8 @@ This project is a **Serverless Feedback Form** where users can submit their **na
 ## Architecture Overview
 
 The project uses a **fully serverless architecture**:
+<img width="1893" height="816" alt="Screenshot 2026-01-01 111858" src="https://github.com/user-attachments/assets/fe914e01-a570-4488-9803-36736ba01e6e" />
+
 
 **Frontend**
 - Static web hosted on **S3**.
@@ -66,6 +68,17 @@ The project uses a **fully serverless architecture**:
 
 **CI/CD**
 - GitHub Actions automatically deploys frontend changes to **S3** and invalidates **CloudFront** cache.
+
+
+
+
+---
+
+## Technologies Used
+
+- **AWS Services:** Lambda, S3, DynamoDB, SES, API Gateway, CloudFront, IAM  
+- **CI/CD:** GitHub Actions  
+- **Frontend:** HTML, CSS, JavaScript (static files)
 
 ---
 
@@ -84,75 +97,4 @@ Lambda could not write to DynamoDB → `ResourceNotFoundException`
 2. Set correct environment variables (`TABLE_NAME`, `REGION`).  
 3. Attach proper IAM permissions (`dynamodb:PutItem`) to Lambda execution role.
 
----
-
-## Technologies Used
-
-- **AWS Services:** Lambda, S3, DynamoDB, SES, API Gateway, CloudFront, IAM  
-- **CI/CD:** GitHub Actions  
-- **Frontend:** HTML, CSS, JavaScript (static files)
-
----
-
-## Setup Instructions
-
-1. **AWS Configuration**
-   - Create S3 buckets for file storage and frontend hosting.
-   - Create a DynamoDB table (`Feedback-list`) for storing feedback.
-   - Create and configure a Lambda function.
-   - Configure Amazon SES for admin email notifications.
-   - Create a REST API using API Gateway.
-   - Attach proper IAM roles and permissions.
-
-2. **Frontend Deployment**
-   - Upload static frontend files to S3.
-   - Enable static website hosting.
-   - Serve via CloudFront.
-
-3. **Environment Variables**
-   - Set Lambda environment variables:
-     ```text
-     TABLE_NAME=Feedback-list
-     BUCKET_NAME=<your-s3-bucket>
-     ADMIN_EMAIL=<your-email>
-     REGION=<aws-region>
-     ```
-
----
-
-## CI/CD Pipeline
-
-- GitHub Actions workflow automatically deploys frontend updates to S3 and invalidates the CloudFront cache.
-- Workflow example:
-```yaml
-name: Deploy Frontend to S3 + CloudFront
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Sync frontend to S3
-        run: aws s3 sync ./frontend s3://${{ secrets.S3_BUCKET }} --delete
-
-      - name: Invalidate CloudFront cache
-        if: env.CLOUDFRONT_DIST_ID != ''
-        env:
-          CLOUDFRONT_DIST_ID: ${{ secrets.CLOUDFRONT_DIST_ID }}
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id $CLOUDFRONT_DIST_ID \
-            --paths "/*"
+## You can see end to end documantation on My Medium account:https://medium.com/@sandakelumdineth120/build-a-real-serverless-aws-project-in-feedback-form-51833e013b9d
